@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
+const LogService = require('./log-service');
 
 const app = express();
 
@@ -14,6 +15,15 @@ const morganOption = (NODE_ENV === 'production')
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
+
+app.get('/seshlogs', (req, res, next) => {
+  const knexInstace = req.app.get('db');
+  LogService.getAllSkateLogs(knexInstace)
+    .then(seshlogs => {
+      res.json(seshlogs);
+    })
+    .catch(next);
+});
 
 app.get('/', (req, res) => {
   res.send('Hello, world!');
