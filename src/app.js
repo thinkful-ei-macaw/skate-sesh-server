@@ -16,11 +16,11 @@ app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 
-app.get('/seshlogs', (req, res, next) => {
+app.get('/skatelogs', (req, res, next) => {
   const knexInstace = req.app.get('db');
   LogService.getAllSkateLogs(knexInstace)
-    .then(seshlogs => {
-      res.json(seshlogs);
+    .then(skatelogs => {
+      res.json(skatelogs);
     })
     .catch(next);
 });
