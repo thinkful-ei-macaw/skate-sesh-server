@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const knex = require('knex');
 const app = require('../src/app');
 
-describe('Skatelogs Endpoints', function () {
+describe.only('Skatelogs Endpoints', function () {
   let db;
 
   before('make knex instance', () => {
@@ -16,6 +16,8 @@ describe('Skatelogs Endpoints', function () {
   after('disconnect from db', () => db.destroy());
 
   before('clean the table', () => db('skatesesh').truncate());
+
+  afterEach('cleanup', () => db('skatesesh').truncate());
 
   context('Given there are skatelogs in the database', () => {
     const testSkatelogs = [
@@ -50,12 +52,19 @@ describe('Skatelogs Endpoints', function () {
         .into('skatesesh')
         .insert(testSkatelogs);
     });
-    //supertest to make request to our exress instances get /skatelogs handler
+    //test to get all skatelogs
     it('GET /skatelogs responds with 200 and all of the articles', () => {
       return supertest(app)
         .get('/skatelogs')
-        .expect(200);
-      // TODO: add more assertions about the body
+        .expect(200, testSkatelogs);
+    });
+    //test to get skatelogs/sesh by Id
+    it('GET /skatelogs/:sesh_id responds with 200 and the specified seshlog', () => {
+      const skateSeshId = 2;
+      const expectedSkateSeshId = testSkatelogs[skateSeshId - 1];
+      return supertest(app)
+        .get(`/skatelogs/${skateSeshId}`)
+        .expect(200, expectedSkateSeshId);
     });
   });
 

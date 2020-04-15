@@ -16,9 +16,19 @@ app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 
+// gets all skatelogs
 app.get('/skatelogs', (req, res, next) => {
   const knexInstace = req.app.get('db');
   LogService.getAllSkateLogs(knexInstace)
+    .then(skatelogs => {
+      res.json(skatelogs);
+    })
+    .catch(next);
+});
+// get skatelogs by sesh id
+app.get('/skatelogs/:sesh_id', (req, res, next) => {
+  const knexInstace = req.app.get('db');
+  LogService.getLogsById(knexInstace, req.params.sesh_id)
     .then(skatelogs => {
       res.json(skatelogs);
     })
