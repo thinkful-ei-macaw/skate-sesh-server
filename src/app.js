@@ -44,8 +44,19 @@ app.get('/skatelogs/:sesh_id', (req, res, next) => {
 });
 // POST endpoint 
 app.post('/skatelogs', jsonParser, (req, res, next) => {
-  const newSkatelog = { board, notes }
-
+  const { board, notes } = req.body;
+  const newSkatelog = { board, notes };
+  LogService.insertSkatelog(
+    req.app.get('db'),
+    newSkatelog
+  )
+    .then(skatelog => {
+      res
+        .status(201)
+        .location(`/skatelogs/${skatelog.id}`)
+        .json(skatelog);
+    })
+    .catch(next);
 });
 
 

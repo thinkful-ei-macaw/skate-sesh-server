@@ -24,6 +24,7 @@ const LogService = {
       .where({ id })
       .update(newSkatelogField);
   }
+
 };
 
 
