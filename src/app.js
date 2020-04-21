@@ -8,6 +8,7 @@ const { NODE_ENV } = require('./config');
 const LogService = require('./log-service');
 
 const app = express();
+const jsonParser = express.json();
 
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
@@ -41,6 +42,12 @@ app.get('/skatelogs/:sesh_id', (req, res, next) => {
     })
     .catch(next);
 });
+// POST endpoint 
+app.post('/skatelogs', jsonParser, (req, res, next) => {
+  const newSkatelog = { board, notes }
+
+});
+
 
 app.get('/', (req, res) => {
   res.send('Hello, world!');

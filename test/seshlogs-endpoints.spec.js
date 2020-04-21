@@ -46,7 +46,7 @@ describe('Skatelogs Endpoints', function () {
     });
   });
 
-  //test for get skatelogs by id end point
+  //test for get skatelogs by id endpoint
   describe(`GET /skatelogs/:sesh_id`, () => {
     context(`Given no session id`, () => {
       it(`responds with 404`, () => {
@@ -75,16 +75,27 @@ describe('Skatelogs Endpoints', function () {
       });
     });
   });
-
+  // test for the post endpoint
   describe.only(`POST /skatelogs`, () => {
     it(`creates a skatelog, responding with a 201 and a new skatesesh`, function () {
+      const newSkatelog = {
+        board: 'Test new skatelog',
+        notes: 'test new sesh notes...'
+      };
       return supertest(app)
         .post('/skatelogs')
-        .send({
-          board: 'Test new skatelog',
-          notes: 'test new sesh notes...'
+        .send(newSkatelog)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.board).to.eql(newSkatelog.board);
+          expect(res.body.notes).to.eql(newSkatelog.notes);
+          expect(res.body).to.have.property('id');
         })
-        .expect(201);
+        .then(postRes =>
+          supertest(app)
+            .get(`skatelogs/${postRes.body.id}`)
+            .excpect(postRes.body)
+        );
     });
   });
 
