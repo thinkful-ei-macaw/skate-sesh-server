@@ -76,6 +76,19 @@ describe('Skatelogs Endpoints', function () {
     });
   });
 
+  describe.only(`POST /skatelogs`, () => {
+    it(`creates a skatelog, responding with a 201 and a new skatesesh`, function () {
+      return supertest(app)
+        .post('/skatelogs')
+        .send({
+          board: 'Test new skatelog',
+          notes: 'test new sesh notes...'
+        })
+        .expect(201);
+    });
+  });
+
+
 });
 
 
