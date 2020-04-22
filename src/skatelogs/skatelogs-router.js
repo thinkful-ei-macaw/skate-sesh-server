@@ -26,7 +26,7 @@ skatelogsRouter
       .then(skatelog => {
         res
           .status(201)
-          .locals(`/skatelogs/${skatelog.id}`)
+          .location(`/skatelogs/${skatelog.id}`)
           .json(skatelog);
       })
       .catch(next);
@@ -40,7 +40,7 @@ skatelogsRouter
       .then(skatelog => {
         if (!skatelog) {
           return res.status(404).json({
-            error: { message: `Sesh doesn't exist` }
+            error: { message: `Skatesesh log doesn't exist` }
           });
         }
         res.json(skatelog);

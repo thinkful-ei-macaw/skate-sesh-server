@@ -76,7 +76,7 @@ describe('Skatelogs Endpoints', function () {
     });
   });
   // test for the post endpoint
-  describe.only(`POST /skatelogs`, () => {
+  describe(`POST /skatelogs`, () => {
     it(`creates a skatelog, responding with a 201 and a new skatelog`, function () {
       this.retries(3);
       const newSkatelog = {
