@@ -19,6 +19,15 @@ skatelogsRouter
   .post(jsonParser, (req, res, next) => {
     const { board, notes } = req.body;
     const newSkatelog = { board, notes };
+
+    for (const [key, value] of Object.entries(newSkatelog)) {
+      if (value === null) {
+        return res.status(400).json({
+          error: { message: `Missing '${key}' in request body` }
+        });
+      }
+    }
+
     LogService.insertSkatelog(
       req.app.get('db'),
       newSkatelog
@@ -44,6 +53,16 @@ skatelogsRouter
           });
         }
         res.json(skatelog);
+      })
+      .catch(next);
+  })
+  .delete((req, res, next) => {
+    LogService.deleteSkatelog(
+      req.app.get('db'),
+      req.params.sesh_id
+    )
+      .then(() => {
+        res.status(204).end();
       })
       .catch(next);
   });

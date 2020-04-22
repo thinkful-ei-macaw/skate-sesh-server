@@ -19,7 +19,7 @@ describe('Skatelogs Endpoints', function () {
 
   afterEach('cleanup', () => db('skatesesh').truncate());
 
-  //test for skatelogs end point
+  //test for GET skatelogs endpoint
   describe(`GET /skatelogs`, () => {
     context(`Given no skatelogs`, () => {
       it(`responds with 200 and an empty list`, () => {
@@ -46,7 +46,7 @@ describe('Skatelogs Endpoints', function () {
     });
   });
 
-  //test for get skatelogs by id endpoint
+  //test for GET skatelogs by id endpoint
   describe(`GET /skatelogs/:sesh_id`, () => {
     context(`Given no session id`, () => {
       it(`responds with 404`, () => {
@@ -75,14 +75,15 @@ describe('Skatelogs Endpoints', function () {
       });
     });
   });
-  // test for the post endpoint
+  // test for the POST and DELETE
   describe(`POST /skatelogs`, () => {
-    it(`creates a skatelog, responding with a 201 and a new skatelog`, function () {
+    it(`creates a skatesesh, responding with a 201 and a new skatelog`, function () {
       this.retries(3);
       const newSkatelog = {
         board: 'Test new skatelog',
-        notes: 'Test new sesh notes...'
+        notes: 'Test new sesh notes...',
       };
+
       return supertest(app)
         .post('/skatelogs')
         .send(newSkatelog)
@@ -92,53 +93,41 @@ describe('Skatelogs Endpoints', function () {
           expect(res.body.notes).to.eql(newSkatelog.notes);
           expect(res.body).to.have.property('id');
           expect(res.headers.location).to.eql(`/skatelogs/${res.body.id}`);
-          const expected = new Date().toLocaleString();
-          const actual = new Date(res.body.date_published).toLocaleString();
+          const expected = Date().toLocaleString();
+          const actual = Date(res.body.date_published).toLocaleString();
           expect(actual).to.eql(expected);
         })
-        .then(postRes =>
+        .then(res =>
           supertest(app)
-            .get(`/skatelogs/${postRes.body.id}`)
-            .expect(postRes.body)
+            .get(`/skatelogs/${res.body.id}`)
+            .expect(res.body)
         );
     });
   });
 
+  describe.only(`DELETE /skatelogs/:sesh_id`, () => {
+    context('Given there are skatelogs in the database', () => {
+      const testSkatelog = makeSeshLogsArray();
 
+      beforeEach('insert skatelogs', () => {
+        return db
+          .into('skatesesh')
+          .insert(testSkatelog);
+      });
+
+      it('responds with 204 and removes the skatelog', () => {
+        const idToRemove = 2;
+        const expectedSkatelog = testSkatelog.filter(skatelog => skatelog.id !== idToRemove);
+        return supertest(app)
+          .delete(`/skatelogs/${idToRemove}`)
+          .expect(204)
+          .then(res =>
+            supertest(app)
+              .get(`/skatelogs`)
+              .expect(expectedSkatelog)
+          );
+      });
+    });
+
+  });
 });
-
-
-//test that were refactored to include descrive, Below. 
-//Will delete before deployment
-
-//   after('disconnect from db', () => db.destroy());
-
-//   before('clean the table', () => db('skatesesh').truncate());
-
-//   afterEach('cleanup', () => db('skatesesh').truncate());
-
-//   context('Given there are skatelogs in the database', () => {
-//     const testSkatelogs = makeSeshLogsArray();
-
-//     beforeEach('insert skatesesh', () => {
-//       return db
-//         .into('skatesesh')
-//         .insert(testSkatelogs);
-//     });
-//     //test to get all skatelogs
-//     it('GET /skatelogs responds with 200 and all of the articles', () => {
-//       return supertest(app)
-//         .get('/skatelogs')
-//         .expect(200, testSkatelogs);
-//     });
-//     //test to get skatelogs/sesh by Id
-//     it('GET /skatelogs/:sesh_id responds with 200 and the specified seshlog', () => {
-//       const skateSeshId = 2;
-//       const expectedSkateSeshId = testSkatelogs[skateSeshId - 1];
-//       return supertest(app)
-//         .get(`/skatelogs/${skateSeshId}`)
-//         .expect(200, expectedSkateSeshId);
-//     });
-//   });
-
-// });

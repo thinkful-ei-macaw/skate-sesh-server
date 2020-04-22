@@ -14,7 +14,7 @@ const LogService = {
   getLogsById(knex, id) {
     return (knex).from('skatesesh').select('*').where('id', id).first();
   },
-  deleteShoppingItem(knex, id) {
+  deleteSkatelog(knex, id) {
     return knex('skatesesh')
       .where({ id })
       .delete();
