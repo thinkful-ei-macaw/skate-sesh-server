@@ -4,8 +4,8 @@ const LogService = {
   },
   insertSkatelog(knex, newSkatelog) {
     return knex
-      .inset(newSkatelog)
-      .into('skatesehs')
+      .insert(newSkatelog)
+      .into('skatesesh')
       .returning('*')
       .then(rows => {
         return rows[0];
