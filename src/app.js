@@ -5,7 +5,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
-const LogService = require('./log-service');
+const LogService = require('./skatelogs/log-service');
 
 const app = express();
 const jsonParser = express.json();
