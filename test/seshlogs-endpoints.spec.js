@@ -20,114 +20,164 @@ describe('Skatelogs Endpoints', function () {
   afterEach('cleanup', () => db('skatesesh').truncate());
 
   //test for GET skatelogs endpoint
-  describe(`GET /skatelogs`, () => {
+  describe(`GET /api/skatelogs`, () => {
     context(`Given no skatelogs`, () => {
       it(`responds with 200 and an empty list`, () => {
         return supertest(app)
-          .get('/skatelogs')
+          .get('/api/skatelogs')
           .expect(200, []);
       });
     });
 
     context('Given there are skatelogs in the database', () => {
-      const testskatelogs = makeSeshLogsArray();
+      const testSeshLogs = makeSeshLogsArray();
 
       beforeEach('insert skatelogs', () => {
         return db
           .into('skatesesh')
-          .insert(testskatelogs);
+          .insert(testSeshLogs);
       });
 
       it('responds with 200 and all of the skatelogs', () => {
         return supertest(app)
-          .get('/skatelogs')
-          .expect(200, testskatelogs);
+          .get('/api/skatelogs')
+          .expect(200, testSeshLogs);
       });
     });
   });
 
   //test for GET skatelogs by id endpoint
-  describe(`GET /skatelogs/:sesh_id`, () => {
+  describe(`GET /api/skatelogs/:sesh_id`, () => {
     context(`Given no session id`, () => {
       it(`responds with 404`, () => {
         const sesh_id = 123456;
         return supertest(app)
-          .get(`/skatelogs/${sesh_id}`)
-          .expect(404, { error: { message: `Skatesesh log doesn't exist` } });
+          .get(`/api/skatelogs/${sesh_id}`)
+          .expect(404, { error: { message: `Skatesesh doesn't exist` } });
       });
     });
 
     context('Given there are skatelogs in the database', () => {
-      const testskatelogs = makeSeshLogsArray();
+      const testSeshLogs = makeSeshLogsArray();
 
       beforeEach('insert skatelogs', () => {
         return db
           .into('skatesesh')
-          .insert(testskatelogs);
+          .insert(testSeshLogs);
       });
 
       it('responds with 200 and the specified article', () => {
         const skateLogId = 2;
-        const expectedSkateSeshId = testskatelogs[skateLogId - 1];
+        const expectedSkateLogId = testSeshLogs[skateLogId - 1];
         return supertest(app)
-          .get(`/skatelogs/${skateLogId}`)
-          .expect(200, expectedSkateSeshId);
+          .get(`/api/skatelogs/${skateLogId}`)
+          .expect(200, expectedSkateLogId);
       });
     });
   });
   // test for the POST and DELETE
-  describe(`POST /skatelogs`, () => {
-    it(`creates a skatesesh, responding with a 201 and a new skatelog`, function () {
+  describe(`POST /api/skatelogs`, () => {
+    it(`Creates a Skatesesh, responding with a 201 and a new skatelog`, function () {
       this.retries(3);
       const newSkatelog = {
-        board: 'Test new skatelog',
-        notes: 'Test new sesh notes...',
+        board: '',
+        notes: '',
       };
 
       return supertest(app)
-        .post('/skatelogs')
+        .post('/api/skatelogs')
         .send(newSkatelog)
         .expect(201)
         .expect(res => {
           expect(res.body.board).to.eql(newSkatelog.board);
           expect(res.body.notes).to.eql(newSkatelog.notes);
-          expect(res.body).to.have.property('id');
-          expect(res.headers.location).to.eql(`/skatelogs/${res.body.id}`);
+          expect(res.headers.location).to.eql(`/api/skatelogs/${res.body.id}`);
           const expected = Date().toLocaleString();
           const actual = Date(res.body.date_published).toLocaleString();
           expect(actual).to.eql(expected);
         })
         .then(res =>
           supertest(app)
-            .get(`/skatelogs/${res.body.id}`)
+            .get(`/api/skatelogs/${res.body.id}`)
             .expect(res.body)
         );
     });
   });
 
-  describe.only(`DELETE /skatelogs/:sesh_id`, () => {
+  describe(`DELETE /api/skatelogs/:sesh_id`, () => {
+    context(`Given no skatelogs`, () => {
+      it(`responds with 404`, () => {
+        const skateSeshId = 123456;
+        return supertest(app)
+          .delete(`/api/skatelogs/${skateSeshId}`)
+          .expect(404, { error: { message: `SkateSesh doesn't exist` } });
+      });
+    });
+
     context('Given there are skatelogs in the database', () => {
-      const testSkatelog = makeSeshLogsArray();
+      const testSeshLogs = makeSeshLogsArray();
 
       beforeEach('insert skatelogs', () => {
         return db
           .into('skatesesh')
-          .insert(testSkatelog);
+          .insert(testSeshLogs);
       });
 
-      it('responds with 204 and removes the skatelog', () => {
+      it('responds with 204 and removes the Skatesesh', () => {
         const idToRemove = 2;
-        const expectedSkatelog = testSkatelog.filter(skatelog => skatelog.id !== idToRemove);
+        const expectedSeshlog = testSeshLogs.filter(sesh_id => sesh_id.id !== idToRemove);
         return supertest(app)
-          .delete(`/skatelogs/${idToRemove}`)
+          .delete(`/api/skatelogs/${idToRemove}`)
           .expect(204)
           .then(res =>
             supertest(app)
-              .get(`/skatelogs`)
-              .expect(expectedSkatelog)
+              .get(`/api/skatelogs/`)
+              .expect(expectedSeshlog)
           );
       });
     });
+
+    describe.only(`PATCH /api/skatelogs/:sesh_id`, () => {
+      context(`Given no skatelogs`, () => {
+        it(`responds with 404`, () => {
+          const sesh_Id = 123456;
+          return supertest(app)
+            .patch(`/api/skatelogs/${sesh_Id}`)
+            .expect(404, { error: { message: `Skatelog doesn't exist` } });
+        });
+      });
+    });
+    context('Given there are skatelogs in the database', () => {
+      const testSeshLogs = makeSeshLogsArray();
+
+      beforeEach('insert seshlog', () => {
+        return db
+          .into('skatesesh')
+          .insert(testSeshLogs);
+      });
+
+      it('responds with 204 and updates the skatelog', () => {
+        const idToUpdate = 2;
+        const updateSeshlog = {
+          board: 'updated sesh title',
+          notes: 'updated sesh content',
+        }
+        const expectedSkatelog = {
+          ...testSeshLogs[idToUpdate - 1],
+          ...updateSeshlog
+        }
+        return supertest(app)
+          .patch(`/api/articles/${idToUpdate}`)
+          .send(updateSeshlog)
+          .expect(204)
+          .then(res =>
+            supertest(app)
+              .get(`/api/skatelogs/${idToUpdate}`)
+              .expect(expectedSkatelog)
+          )
+      });
+    });
+
 
   });
 });

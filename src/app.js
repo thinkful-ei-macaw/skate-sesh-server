@@ -18,7 +18,7 @@ app.use(helmet());
 app.use(cors());
 
 //skatelogs endPoints 
-app.use('/skatelogs', skatelogsRouter);
+app.use('/api/skatelogs', skatelogsRouter);
 
 
 
