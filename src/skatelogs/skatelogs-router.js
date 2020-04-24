@@ -19,8 +19,8 @@ skatelogsRouter
       .catch(next);
   })
   .post(jsonParser, (req, res, next) => {
-    const { board, notes } = req.body;
-    const newSkatelog = { board, notes };
+    const { board, notes, account } = req.body;
+    const newSkatelog = { board, notes, account };
 
     for (const [key, value] of Object.entries(newSkatelog)) {
       if (value === null) {
@@ -30,7 +30,7 @@ skatelogsRouter
       }
     }
 
-    LogService.insertSkatelog(
+    LogService.insertSkatelogs(
       req.app.get('db'),
       newSkatelog
     )
@@ -63,14 +63,13 @@ skatelogsRouter
   })
   .get((req, res, next) => {
     res.json({
-      id: res.skatelog.id,
       board: res.skatelog.board,
-      notes: xss(res.skatelog.notes)
-
+      notes: xss(res.skatelog.notes),
+      account: res.skatelog.account
     });
   })
   .delete((req, res, next) => {
-    LogService.deleteSkatelog(
+    LogService.deleteSkatelogs(
       req.app.get('db'),
       req.params.sesh_id
     )
@@ -80,10 +79,10 @@ skatelogsRouter
       .catch(next);
   })
   .patch(jsonParser, (req, res, next) => {
-    const { board, notes } = req.body;
-    const seshLogToUpdate = { board, notes };
+    const { board, notes, account } = req.body;
+    const seshLogToUpdate = { board, notes, account };
 
-    LogService.updateSkatelog(
+    LogService.updateSkatelogs(
       req.app.get('db'),
       req.params.sesh_id,
       seshLogToUpdate
