@@ -6,6 +6,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
 const skatelogsRouter = require('./skatelogs/skatelogs-router');
+const accountsRouter = require('./accounts/accounts-router');
 
 const app = express();
 
@@ -19,7 +20,7 @@ app.use(cors());
 
 //skatelogs endPoints 
 app.use('/api/skatelogs', skatelogsRouter);
-
+app.use('/api/accounts', accountsRouter);
 
 
 

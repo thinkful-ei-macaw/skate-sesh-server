@@ -1,12 +1,12 @@
 const AccountsService = {
   getAllAccounts(knex) {
-    return knex.select('*').from('accounts');
+    return knex.from('account').select('*');
   },
 
   insertAccount(knex, newAccount) {
     return knex
       .insert(newAccount)
-      .into('accounts')
+      .into('account')
       .returning('*')
       .then(rows => {
         return rows[0];
@@ -15,7 +15,7 @@ const AccountsService = {
 
   getById(knex, id) {
     return knex
-      .from('accounts')
+      .from('account')
       .select('*')
       .where('id', id)
       .first();

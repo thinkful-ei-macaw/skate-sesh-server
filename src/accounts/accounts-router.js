@@ -9,8 +9,9 @@ const jsonParser = express.json();
 
 const serializeAccount = account => ({
   id: account.id,
-  fullname: xss(account.fullname),
-  accountname: xss(account.accountname),
+  full_name: xss(account.full_name),
+  user_name: xss(account.user_name),
+  user_password: xss(account.user_password),
   date_created: account.date_created,
 });
 
@@ -18,15 +19,15 @@ accountsRouter
   .route('/')
   .get((req, res, next) => {
     const knexInstance = req.app.get('db');
-    AccountsService.getAllaccounts(knexInstance)
+    AccountsService.getAllAccounts(knexInstance)
       .then(accounts => {
         res.json(accounts.map(serializeAccount));
       })
       .catch(next);
   })
   .post(jsonParser, (req, res, next) => {
-    const { fullname, username, password } = req.body;
-    const newAccount = { fullname, username };
+    const { full_name, user_name, user_password } = req.body;
+    const newAccount = { full_name, user_name, user_password };
 
     for (const [key, value] of Object.entries(newAccount)) {
       if (value === null) {
@@ -36,10 +37,11 @@ accountsRouter
       }
     }
 
-    newAccount.username = username;
-    newAccount.password = password;
+    newAccount.full_name = full_name;
+    newAccount.user_name = user_name;
+    newAccount.user_password = user_password;
 
-    AccountsService.insertAccountnewAccount(
+    AccountsService.insertAccount(
       req.app.get('db'),
       newAccount
     )
@@ -84,14 +86,14 @@ accountsRouter
       .catch(next);
   })
   .patch(jsonParser, (req, res, next) => {
-    const { fullname, username, password } = req.body;
-    const accountToUpdate = { fullname, username, password };
+    const { full_name, user_name, user_password } = req.body;
+    const accountToUpdate = { full_name, user_name, user_password };
 
     const numberOfValues = Object.values(accountToUpdate).filter(Boolean).length;
     if (numberOfValues === 0)
       return res.status(400).json({
         error: {
-          message: `Request body must contain either 'fullname'accountname', or  'password' `
+          message: `Request body must contain either 'fullname'accountname', or 'password' `
         }
       });
 
