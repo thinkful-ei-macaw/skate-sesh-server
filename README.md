@@ -24,3 +24,9 @@ Run the tests `npm test`
 ## Deploying
 
 When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's master branch.
+
+## seed database
+ psql -U postgres -d skatesesh -f ./seeds/seed.skatesesh_log
+
+ ## run script to create table
+ psql -U postgres -d skatesesh -F ./sql-scripts/account.sql

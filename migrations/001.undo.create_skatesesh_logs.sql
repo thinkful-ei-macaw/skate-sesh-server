@@ -1,1 +1,2 @@
-DROP TABLE IF EXISTS blogful_articles;
+DROP TABLE IF EXISTS skatesesh_log;
+DROP TABLE IF EXISTS account;

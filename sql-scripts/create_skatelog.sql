@@ -1,7 +1,10 @@
+TRUNCATE skatesesh_log, account RESTART IDENTITY CASCADE;
 
 ALTER TABLE IF EXISTS skatesesh_log
   DROP COLUMN user_name;
 
+DROP TABLE IF EXISTS skatesesh_log;
+DROP TABLE IF EXISTS account;
 
 
 CREATE TABLE account (
