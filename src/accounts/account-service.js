@@ -1,11 +1,11 @@
-const AccountService = {
-  getAllUsers(knex) {
+const AccountsService = {
+  getAllAccounts(knex) {
     return knex.select('*').from('accounts');
   },
 
-  insertUser(knex, newUser) {
+  insertAccount(knex, newAccount) {
     return knex
-      .insert(newUser)
+      .insert(newAccount)
       .into('accounts')
       .returning('*')
       .then(rows => {
@@ -21,17 +21,17 @@ const AccountService = {
       .first();
   },
 
-  deleteUser(knex, id) {
+  deleteAccount(knex, id) {
     return knex('account')
       .where({ id })
       .delete();
   },
 
-  updateUser(knex, id, newUserFields) {
+  updateAccount(knex, id, newAccountFields) {
     return knex('account')
       .where({ id })
-      .update(newUserFields);
+      .update(newAccountFields);
   },
 };
 
-module.exports = AccountService;
+module.exports = AccountsService;
